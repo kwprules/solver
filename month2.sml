@@ -3,6 +3,15 @@ fun max f [x] = f x
   | max f (x::xs) = Int.max (f x, max f xs)
   | max _ _ = raise Match
 
+(* same as above but tail recursive (but uglier) *)
+fun maxOn _ [] = raise Match
+  | maxOn f (x::xs) =
+      let fun max (f, y, []) = y
+            | max (f, y, x::xs) = max (f, Int.max (y, f x), xs)
+      in
+        max (f, f x, xs)
+      end
+
 fun squared x = x * x
 
 (* foldr that returns array of intermediate values *)
@@ -19,7 +28,7 @@ fun foldrAccum f z xs =
 
 fun maxSquareFromRow xs =
   let fun areaFromNewBar (n, ([], i, currMax)) = ([(n, i)], i + 1, currMax)
-        | areaFromNewBar (n, (stack as (n', i')::numIndices), i, currMax) =
+        | areaFromNewBar (n, (stack as (n', i')::numIndices, i, currMax)) =
            case (Int.compare (n, n'), numIndices)
              of (LESS, []) =>
                   ((n, i)::[], i + 1, squared (Int.max(currMax, Int.min(n', i'))))
@@ -32,11 +41,11 @@ fun maxSquareFromRow xs =
                    end
               | _ => ((n, i)::stack, i + 1, currMax)
     in
-      #3 foldr areaFromNewBar ([(0, 0)], 1, 0) (0::xs)
+      #3 (foldr areaFromNewBar ([(0, 0)], 1, 0) (0::xs))
     end
 
 
 fun maxSquareArea [] = 0
   | maxSquareArea (first::rest) =
-    max maxSquareFromRow
-        (foldrAccum (ListPair.foldrEq (fn (b, n, xs) => (n + b) * b::xs) []) first rest)
+    maxOn maxSquareFromRow
+          (foldrAccum (ListPair.foldrEq (fn (b, n, xs) => (n + b) * b::xs) []) first rest)
