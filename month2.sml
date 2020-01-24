@@ -48,4 +48,4 @@ fun maxSquareFromRow xs =
 fun maxSquareArea [] = 0
   | maxSquareArea (first::rest) =
     maxOn maxSquareFromRow
-          (foldrAccum (ListPair.foldrEq (fn (b, n, xs) => (n + b) * b::xs) []) first rest)
+          (foldrAccum (ListPair.mapEq (fn (b, n) => (n + b) * b)) first rest)
