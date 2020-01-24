@@ -3,7 +3,7 @@ fun maxArea xs =
         | areaFromNewBar (n, (stack as (n', i')::numIndices, i, currMax)) =
            case (Int.compare (n, n'), numIndices)
              of (LESS, []) =>
-                  ((n, i)::[], i + 1, Int.max(currMax, Int.min(n', i')))
+                  ((n, i)::[], i + 1, Int.max(currMax, n' * i'))
               | (LESS, (_, i'')::_) =>
                   let val newmaxArea = n' * (i - i'' - 1)
                       val (newStack, newIndex, newMax) =
